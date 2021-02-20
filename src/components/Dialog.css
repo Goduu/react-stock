@@ -1,0 +1,40 @@
+
+
+.dialog-wrapper{
+    position: absolute;
+    margin: 5px;
+    border-radius: 8px;
+    width: 300px;
+    position: absolute;
+    left: 50%;
+    top: 50%; 
+    margin-left: -150px;
+    margin-top: -150px;
+    background-color: #332940;
+    font-size: 1rem;
+}
+
+.body{
+    margin: 10px;
+    padding: 10px;
+    margin-bottom: 70px;
+    text-align: justify;
+}
+
+.header{
+    text-align: left;
+    margin: 10px;
+    border-radius: 8px;
+    padding: 9px;
+    background-color: #332940;
+    font-size: 1.3rem;
+}
+
+.footer{
+    position: absolute;
+    bottom: 0;
+    width: auto;
+    display: block;
+    padding: 9px;
+right: 9px;
+}

@@ -1,0 +1,18 @@
+
+.blocks-container{
+    display: flex;
+    margin: 10px;
+}
+
+.blocks-bg{
+    margin: 5px;
+    background-color: #282727;
+    border-radius: 5px;;
+    padding: 5px;
+}
+.blocks-content{
+    font-size: 19px;
+    color: #ffffff;
+    opacity: 1;
+
+}
