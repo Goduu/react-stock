@@ -28,7 +28,6 @@ class TextField extends React.Component {
       return (
         <form onSubmit={this.handleSubmit} style={{display:'flex'}}>
           <label>
-            Stock: 
             <input type="text" className='text-field' value={this.state.value} onChange={this.handleChange} />
           </label>
           <Button color="magenta" content="Submit" onClick={this.handleSubmit}></Button>

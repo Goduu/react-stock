@@ -2,11 +2,11 @@ import React from "react";
 import {
   BrowserRouter as Router,
   Switch,
-  Route,
-  Link
+  Route
 } from "react-router-dom";
 import ShowRoom from './components/ShowRoom';
 import NavBar from './components/NavBar'
+import StocksDashboard from './components/StocksDashboard'
 
 // This site has 3 pages, all of which are rendered
 // dynamically in the browser (not server rendered).
@@ -31,7 +31,7 @@ export default function BasicExample() {
         */}
         <Switch >
           <Route exact path="/">
-            <Home />
+            <StocksDashboard />
           </Route>
           <Route path="/about">
             <About />

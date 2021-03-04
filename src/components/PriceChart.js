@@ -3,7 +3,6 @@ import React from 'react'
 import Block from './Block';
 import LineChart from './LineChart';
 import * as rq from './requests'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 
 //https://css-triscks.com/snippets/css/complete-guide-grid/
