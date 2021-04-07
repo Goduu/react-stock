@@ -1,6 +1,8 @@
 import axios from 'axios';
+import useToken from './useToken';
 
 const apiUrl = 'http://127.0.0.1:5000/api/';
+
 
 export function get_analysts_info(){
     axios.get(apiUrl+'analyst_info/')
@@ -19,7 +21,8 @@ export function get_analysts_info(){
 
 export function get_live_price(tick){
   return new Promise((resolve, reject) => {
-    axios.get(apiUrl+'price?tick=' + tick)
+    const token = JSON.parse(sessionStorage.getItem('token'));
+    axios.get(apiUrl+'price?token='+ token + '&tick=' + tick +'')
       .then(res => {
         console.log("PRICE",res.data.price.toFixed(2))
         resolve(res.data.price.toFixed(2))

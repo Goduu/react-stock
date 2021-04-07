@@ -2,6 +2,7 @@ import './Login.css';
 import React,{ useState }  from 'react'
 import Button from './Button';
 import * as rq from './requests'
+import PropTypes from 'prop-types';
 
 
 
@@ -9,7 +10,6 @@ function loginUser(credentials) {
     return new Promise((resolve, reject) => {
         rq.login(credentials)
         .then(res => {
-            console.log(res.data.token)
             resolve(res)
         })
     });
@@ -27,7 +27,7 @@ export default function Login({ setToken }){
             loginUser({
               email,
               password
-            }).then(token => setToken(token));
+            }).then(token => {setToken(token.data.token); console.log("Token in login",token.data.token)});
             
             console.log("finish")
           }

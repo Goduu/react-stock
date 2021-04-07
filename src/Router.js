@@ -8,6 +8,7 @@ import ShowRoom from './components/ShowRoom';
 import NavBar from './components/NavBar'
 import StocksDashboard from './components/StocksDashboard'
 import Login from './components/Login'
+import useToken from './components/useToken';
 
 // This site has 3 pages, all of which are rendered
 // dynamically in the browser (not server rendered).
@@ -18,10 +19,16 @@ import Login from './components/Login'
 // making sure things like the back button and bookmarks
 // work properly.
 
+
 export default function BasicExample() {
-  const [token, setToken] = useState();
+  const { token, setToken} = useToken();
+
   if(!token) {
+    console.log("no token", token)
     return <Login setToken={setToken} />
+  } else {
+    
+    console.log("token", token)
   }
 
   return (

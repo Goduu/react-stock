@@ -6,6 +6,8 @@ import stocks_requests as rq
 import jwt 
 import datetime
 import json
+from functools import wraps
+import sys
 
 #--------
 import os
@@ -58,8 +60,12 @@ def token_required(f):
             return jsonify({'message' : 'Token is missing!'}), 403
 
         try: 
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            data = jwt.decode(token, app.config['SECRET_KEY'],algorithms=["HS256"])
+        except jwt.exceptions.ExpiredSignatureError:
+            print("ALCAPAHA ERROR")
+            return jsonify({'message' : 'Token is expired!'}), 403
         except:
+            print("ERROR",sys.exc_info()[0])
             return jsonify({'message' : 'Token is invalid!'}), 403
 
         return f(*args, **kwargs)
@@ -77,8 +83,9 @@ def login():
     if user:
         if(verify_and_update_password(data['password'],user )):
             token = jwt.encode({'user' : data['email'], 
-                'exp' : datetime.datetime.utcnow() + datetime.timedelta(seconds=15)},
-                app.config['SECRET_KEY'])
+                'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=1)},
+                app.config['SECRET_KEY'], algorithm="HS256")
+            print("Logged as ", data['email'])
             return jsonify({'token' : token})
 
     
@@ -89,11 +96,9 @@ def login():
 
 
 
-
-
-
 @app.route('/api/price/')
 @cross_origin()
+@token_required
 def get_live_price():
     tick = request.args.get('tick')
     print("get_live_price")
