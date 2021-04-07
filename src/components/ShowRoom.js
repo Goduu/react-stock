@@ -11,6 +11,7 @@ import BarChart from './BarChart';
 import TextField from './TextField';
 import PriceChart from './PriceChart';
 import DividendChart from './DividendChart';
+import Login from './Login';
 
 
 let dataTest_ = {
@@ -33,6 +34,7 @@ class ShowRoom extends React.Component{
     this.getLineChartData = this.getLineChartData.bind(this);
     this.getBarChartData = this.getBarChartData.bind(this);
     this.handleSubmitTick = this.handleSubmitTick.bind(this);
+    this.setToken = this.setToken.bind(this);
     this.chartLineReference = React.createRef();
     this.charBartReference = React.createRef();
     this.priceChartRef = React.createRef();
@@ -95,6 +97,11 @@ class ShowRoom extends React.Component{
       this.price = res
      })
    }
+
+  setToken(userToken) {
+    console.log("user tok", userToken)
+  }
+  
    
    render(){
     let icon = <FontAwesomeIcon icon="check" color="#121212" title="check"/> 
@@ -105,6 +112,8 @@ class ShowRoom extends React.Component{
             <header className="App-header">
                 <h1>ShowRoom</h1>
                 <p>Buttons</p>
+                <Login setToken={this.setToken}/>
+                <Button color="green" content="Login" onClick={rq.login}></Button>
                 <Button color="green" content="Button Green" onClick={this.testOnClick}></Button>
                 <Button color="magenta" content="Button Magenta" onClick={this.testOnClick}/>
                 <Button color="magenta" content={icon} type="circle" onClick={this.testOnClick}/>

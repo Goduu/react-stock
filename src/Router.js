@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -7,6 +7,7 @@ import {
 import ShowRoom from './components/ShowRoom';
 import NavBar from './components/NavBar'
 import StocksDashboard from './components/StocksDashboard'
+import Login from './components/Login'
 
 // This site has 3 pages, all of which are rendered
 // dynamically in the browser (not server rendered).
@@ -18,6 +19,11 @@ import StocksDashboard from './components/StocksDashboard'
 // work properly.
 
 export default function BasicExample() {
+  const [token, setToken] = useState();
+  if(!token) {
+    return <Login setToken={setToken} />
+  }
+
   return (
     <Router >
       <div >
@@ -38,6 +44,9 @@ export default function BasicExample() {
           </Route>
           <Route path="/showroom">
             <ShowRoom />
+          </Route>
+          <Route path="/login">
+            <Login />
           </Route>
         </Switch>
       </div>

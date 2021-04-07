@@ -17,6 +17,9 @@ class NavBar extends React.Component{
                     <li className="nb-list-item"> 
                         <Link to="/about">About</Link>
                     </li>
+                    <li className="nb-list-item"> 
+                        <Link to="/login">Login</Link>
+                    </li>
                     
                 </ul>
             </div>

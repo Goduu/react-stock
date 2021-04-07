@@ -27,6 +27,20 @@ export function get_live_price(tick){
   });
 }
 
+export function login(credentials){
+  const headers = {headers: {'Content-Type': 'application/json'}}
+  const data = {
+    data:  JSON.stringify(credentials)
+  };
+  return new Promise((resolve, reject) => {
+    axios.post(apiUrl+'login', data,headers)
+      .then(res => {
+          console.log("LOGIN", res)
+        resolve(res)
+      })
+  });
+}
+
 export function getQuoteData(tick){
   return new Promise((resolve, reject) => {
     axios.get(apiUrl+'quote_data?tick=' + tick)
