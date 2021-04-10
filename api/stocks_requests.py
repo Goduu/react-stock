@@ -5,12 +5,27 @@ from flask import jsonify
 import pandas as pd
 from datetime import timedelta
 from datetime import datetime
+from functools import wraps
+import sys
 
 
+def except_handler(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        try: 
+            return f(*args, **kwargs)
+        except:
+            e = sys.exc_info()
+            print("ERROR ",e)
+            return {'message' : 'An Error Occurred'}
+    return decorated
+
+@except_handler
 def get_live_price(tick):
     result = {'price': yf.get_live_price(tick)}
     return(result)
 
+@except_handler
 def get_analysts_info(tick):
     analysts_info = yf.get_analysts_info(tick)
     di = []
@@ -19,24 +34,31 @@ def get_analysts_info(tick):
     return(jsonify(di))
 
 #Get price data
+@except_handler
 def get_data(tick):
-    end_date = datetime.today()
-    delta = timedelta(days=120)
-    start_date = (end_date-delta).strftime("%d/%m/%Y")
-    end_date = end_date.strftime("%d/%m/%Y")
-    print("in get data", tick)
-    data = yf.get_data(tick, start_date = start_date, end_date = end_date)
-    return data.to_json()
+    try:
+        end_date = datetime.today()
+        delta = timedelta(days=120)
+        start_date = (end_date-delta).strftime("%d/%m/%Y")
+        end_date = end_date.strftime("%d/%m/%Y")
+        print("in get data", tick)
+        data = yf.get_data(tick, start_date = start_date, end_date = end_date)
+        return data.to_json()
+    except:
+        return({'message' : 'Error in request!'})
 
+@except_handler
 def get_dividends(tick):
     print("in get dividends", tick)
     data = yf.get_dividends(tick).iloc[-10:]
     return data.to_json()
 
+@except_handler
 def get_quote_data(tick):
     print("in get_quote_data", tick)
     data = yf.get_quote_data(tick)
     return data
+
 
 # get_analysts_info
 # get_balance_sheet

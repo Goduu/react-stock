@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -7,6 +7,7 @@ import {
 import ShowRoom from './components/ShowRoom';
 import NavBar from './components/NavBar'
 import StocksDashboard from './components/StocksDashboard'
+import User from './components/User'
 import Login from './components/Login'
 import useToken from './components/useToken';
 
@@ -21,56 +22,45 @@ import useToken from './components/useToken';
 
 
 export default function BasicExample() {
-  const { token, setToken} = useToken();
+  const {token, setToken} = useToken();
 
   if(!token) {
-    console.log("no token", token)
     return <Login setToken={setToken} />
   } else {
-    
-    console.log("token", token)
+    return (
+      <Router >
+        <div >
+          <NavBar/>
+          {/*
+            A <Switch> looks through all its children <Route>
+            elements and renders the first one whose path
+            matches the current URL. Use a <Switch> any time
+            you have multiple routes, but you want only one
+            of them to render at a time
+          */}
+          <Switch >
+            <Route exact path="/">
+              <StocksDashboard />
+            </Route>
+            <Route path="/about">
+              <About />
+            </Route>
+            <Route path="/showroom">
+              <ShowRoom />
+            </Route>
+            <Route path="/login">
+              <User />
+            </Route>
+          </Switch>
+        </div>
+      </Router>
+    );
   }
 
-  return (
-    <Router >
-      <div >
-        <NavBar/>
-        {/*
-          A <Switch> looks through all its children <Route>
-          elements and renders the first one whose path
-          matches the current URL. Use a <Switch> any time
-          you have multiple routes, but you want only one
-          of them to render at a time
-        */}
-        <Switch >
-          <Route exact path="/">
-            <StocksDashboard />
-          </Route>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/showroom">
-            <ShowRoom />
-          </Route>
-          <Route path="/login">
-            <Login />
-          </Route>
-        </Switch>
-      </div>
-    </Router>
-  );
 }
 
 // You can think of these components as "pages"
 // in your app.
-
-function Home() {
-  return (
-    <div>
-      <h2>Home</h2>
-    </div>
-  );
-}
 
 function About() {
   return (

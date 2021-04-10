@@ -2,7 +2,7 @@ import './Login.css';
 import React,{ useState }  from 'react'
 import Button from './Button';
 import * as rq from './requests'
-import PropTypes from 'prop-types';
+import Dialog from './Dialog';
 
 
 
@@ -14,25 +14,41 @@ function loginUser(credentials) {
         })
     });
     
-   }
+}
+
 
 export default function Login({ setToken }){
   
         const [email, setEmail] = useState();
         const [password, setPassword] = useState();
+        let showDialog = false;
+        let dialogRef = React.createRef();
 
         const handleSubmit = async e => {
-            console.log('handleSubmit', email, password)
             e.preventDefault();
             loginUser({
               email,
               password
-            }).then(token => {setToken(token.data.token); console.log("Token in login",token.data.token)});
+            }).then(token => {
+                setToken(token.data.token);})
+                .catch( function (error) {
+                    console.log(error.response);
+                  })
             
-            console.log("finish")
           }
+          function toggleDialog(error){
+            dialogRef.current.setState({
+                active: !showDialog,
+                text: error
+            }) //({active: !showDialog})
+            showDialog = !showDialog;
+        }
         return (
             <div className="login-wrapper">
+                <Dialog text="E-mail or password is wrong."
+                 active={showDialog}
+                 onClose={toggleDialog}
+                 ref={dialogRef}></Dialog>
                 <div >
                     <label>
                         E-mail:
@@ -49,7 +65,6 @@ export default function Login({ setToken }){
             </div>
         );
         
-    
 }
 
 // Login.propTypes = {

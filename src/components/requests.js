@@ -1,8 +1,30 @@
 import axios from 'axios';
-import useToken from './useToken';
 
 const apiUrl = 'http://127.0.0.1:5000/api/';
 
+export function login(credentials){
+  
+
+  const headers = {headers: {'Content-Type': 'application/json'}}
+  const data = {
+    data:  JSON.stringify(credentials)
+  };
+  return new Promise((resolve, reject) => {
+    axios.post(apiUrl+'login', data,headers)
+      .then(res => {
+        resolve(res)
+      })
+  });
+}
+
+export function get_user_data(email){
+  return new Promise((resolve, reject) => {
+    axios.get(apiUrl+'get_user_data/?email='+ email)
+      .then(res => {
+        resolve(res)
+      })
+  });
+}
 
 export function get_analysts_info(){
     axios.get(apiUrl+'analyst_info/')
@@ -21,34 +43,22 @@ export function get_analysts_info(){
 
 export function get_live_price(tick){
   return new Promise((resolve, reject) => {
-    const token = JSON.parse(sessionStorage.getItem('token'));
-    axios.get(apiUrl+'price?token='+ token + '&tick=' + tick +'')
+    axios.get(apiUrl+'price/?tick=' + tick)
       .then(res => {
-        console.log("PRICE",res.data.price.toFixed(2))
-        resolve(res.data.price.toFixed(2))
+        if(res.data.price){
+          resolve(res.data.price.toFixed(2))
+        }
       })
+      .catch(error => reject(error))
   });
 }
 
-export function login(credentials){
-  const headers = {headers: {'Content-Type': 'application/json'}}
-  const data = {
-    data:  JSON.stringify(credentials)
-  };
-  return new Promise((resolve, reject) => {
-    axios.post(apiUrl+'login', data,headers)
-      .then(res => {
-          console.log("LOGIN", res)
-        resolve(res)
-      })
-  });
-}
+
 
 export function getQuoteData(tick){
   return new Promise((resolve, reject) => {
-    axios.get(apiUrl+'quote_data?tick=' + tick)
+    axios.get(apiUrl+'quote_data/?tick=' + tick)
       .then(res => {
-        console.log("-----quote_data",res.data)
         resolve(res.data)
       })
   });
@@ -56,7 +66,7 @@ export function getQuoteData(tick){
 
 export function getData(tick){
   return new Promise((resolve, reject) => {
-    axios.get(apiUrl+'data?tick='+ tick)
+    axios.get(apiUrl+'data/?tick='+ tick)
       .then(res => {
         let close_data = res.data.close
         let values = []
@@ -74,7 +84,7 @@ export function getData(tick){
 export function getDividends(tick){
   console.log("TICK no request", tick)
   return new Promise((resolve, reject) => {
-    axios.get(apiUrl+'dividends?tick='+tick)
+    axios.get(apiUrl+'dividends/?tick='+tick)
       .then(res => {
         console.log(res)
         let dividend = res.data.dividend

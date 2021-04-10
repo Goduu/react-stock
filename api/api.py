@@ -1,7 +1,8 @@
 import time
 from flask import Flask,jsonify, request, make_response
 # from app_config import app
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS,cross_origin
+from flask_accept import accept,accept_fallback
 import stocks_requests as rq
 import jwt 
 import datetime
@@ -21,6 +22,7 @@ from models import User, Role
 
 # Create app
 app = Flask(__name__)
+CORS(app, origins = "http://localhost:3000")
 app.config['DEBUG'] = True
 
 # Generate a nice key using secrets.token_urlsafe()
@@ -28,6 +30,8 @@ app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", 'pf9Wkove4IKEAXvy-cQkeDP
 # Bcrypt is set as default SECURITY_PASSWORD_HASH, which requires a salt
 # Generate a good salt using: secrets.SystemRandom().getrandbits(128)
 app.config['SECURITY_PASSWORD_SALT'] = os.environ.get("SECURITY_PASSWORD_SALT", '146585145368132386173505678016728509634')
+# app.config['CORS_HEADERS'] = 'Content-Type'
+
 
 # Setup Flask-Security
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
@@ -44,36 +48,27 @@ def create_user():
         user_datastore.create_user(email="test@me.com", password=hash_password("password"))
     db_session.commit()
 
-#----------------------
-
-
-CORS(app, resources={r'/*': {'origins': '*'}})
-
-
-
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.args.get('token') #http://127.0.0.1:5000/route?token=alshfjfjdklsfj89549834ur
-
+        # token = request.args.get('token') #http://127.0.0.1:5000/route?token=alshfjfjdklsfj89549834ur
+        token = request.headers.get('Authorization').split(" ")[1] if request.headers.get('Authorization') else None 
+        print(token)
         if not token:
             return jsonify({'message' : 'Token is missing!'}), 403
-
         try: 
             data = jwt.decode(token, app.config['SECRET_KEY'],algorithms=["HS256"])
         except jwt.exceptions.ExpiredSignatureError:
-            print("ALCAPAHA ERROR")
-            return jsonify({'message' : 'Token is expired!'}), 403
+            return jsonify({'message' : 'Token is expired!'}), 401
         except:
             print("ERROR",sys.exc_info()[0])
-            return jsonify({'message' : 'Token is invalid!'}), 403
+            return jsonify({'message' : 'Token is invalid!'}), 401
 
         return f(*args, **kwargs)
 
     return decorated
 
 @app.route('/api/login', methods=['GET', 'POST'])
-@cross_origin()
 def login():
     print("data",request.get_json())
     data = json.loads(request.get_json()['data'])
@@ -91,46 +86,52 @@ def login():
     
     return make_response('Could not verify!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
 
-    # if auth and auth.password == 'secret':
-    # token = jwt.encode({'user' : auth.email, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(seconds=15)}, app.config['SECRET_KEY'])
-
-
 
 @app.route('/api/price/')
-@cross_origin()
 @token_required
 def get_live_price():
+    headers = request.headers
+    print("headers",headers)
     tick = request.args.get('tick')
     print("get_live_price")
     return rq.get_live_price(tick)
 
 @app.route('/api/analyst-info/')
-@cross_origin()
+@token_required
 def get_analysts_info():
     tick = request.args.get('tick')
     print("get_current_time")
     return rq.get_analysts_info(tick)
 
 @app.route('/api/data/')
-@cross_origin()
+@token_required
 def get_data():
     tick = request.args.get('tick')
     print("get data")
     return rq.get_data(tick)
 
 @app.route('/api/dividends/')
-@cross_origin()
+@token_required
 def get_dividends():
     tick = request.args.get('tick')
     print("get_dividends")
     return rq.get_dividends(tick)
 
 @app.route('/api/quote_data/')
-@cross_origin()
+@token_required
 def get_quote_data():
     tick = request.args.get('tick')
     print("get_quote_data")
     return rq.get_quote_data(tick)
+
+@app.route('/api/get_user_data/')
+@token_required
+def get_user_data():
+    email = request.args.get('email')
+    print("email", email)
+    user = user_datastore.find_user(email=email)
+    print("get_user_data", user.email,user.username)
+    return jsonify({'ok': 'ok'})
 
 
 

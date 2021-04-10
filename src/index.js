@@ -2,16 +2,23 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './Router';
+import {Router} from "react-router-dom";
 import reportWebVitals from './reportWebVitals';
+import {createBrowserHistory} from 'history';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
+import interceptor from './interceptor'
+
 
 library.add(fas)
 
+const history = createBrowserHistory()
+export default history;
+
 ReactDOM.render(
-  <React.StrictMode >
+  <Router history={history} >
     <App />
-  </React.StrictMode>,
+  </Router>,
   document.getElementById('root')
 );
 

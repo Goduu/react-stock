@@ -6,15 +6,6 @@ import * as rq from './requests'
 
 
 //https://css-triscks.com/snippets/css/complete-guide-grid/
-  
-let dataTest_ = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-  datasets: [
-    {
-      data: [65, 59, 80, 81, 56, 55, 40]
-    }
-  ]
-};
 
 class PriceChart extends React.Component{
     constructor(props) {
@@ -39,24 +30,29 @@ class PriceChart extends React.Component{
       
       let priceChartReference = this.priceChartReference
       rq.getData(tick).then(function (res){
-        let data = {...priceChartReference.current.state.dataTest}
-        data.labels = res[0]
-        data.datasets[0].data =  res[1]
-        priceChartReference.current.setState({dataTest: data})
+        if(res){
+          let data = {...priceChartReference.current.state.dataTest}
+          data.labels = res[0]
+          data.datasets[0].data =  res[1]
+          priceChartReference.current.setState({dataTest: data})
+        }
        
       })
     }
     getQuoteData(tick){
       let blockRef = this.blockRef;
-      rq.getQuoteData(tick).then(function (res){
-        console.log("STATE", blockRef.current);
-        blockRef.current.setState(
-          {headtitle: res.longName.concat(" - ").concat(tick),
-             value: res.financialCurrency.concat(" ").concat(res.regularMarketPrice),
-             })
-        console.log("STATE", blockRef.current);
-
-      })
+      
+        return rq.getQuoteData(tick)
+        .then(function (res){
+          if(res.financialCurrency & res.longName){
+            blockRef.current.setState(
+            {headtitle: res.longName.concat(" - ").concat(tick),
+                 value: res.financialCurrency.concat(" ").concat(res.regularMarketPrice),
+                 })
+          }
+  
+          })
+        
 
     }
     setNewTick(tick){

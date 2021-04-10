@@ -6,6 +6,7 @@ class Dialog extends React.Component{
 
     constructor(props) {
         super(props);
+        this.state = {'active': props.active, 'text': props.text}
         this.handleClose = this.handleClose.bind(this);
     }
 
@@ -14,7 +15,7 @@ class Dialog extends React.Component{
     }
 
     render() {
-        if(!this.props.active){
+        if(!this.state.active){
             return null
         } else {
             return (        
@@ -23,7 +24,7 @@ class Dialog extends React.Component{
                         Dialog header!
                     </div>
                     <div className="body"  >
-                        {this.props.text} 
+                        {this.state.text} 
                     </div>
                     <div className="footer">
                         <Button content='Ok' color='magenta' onClick={this.handleClose}></Button>

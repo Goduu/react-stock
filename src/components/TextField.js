@@ -19,7 +19,7 @@ class TextField extends React.Component {
     }
   
     handleSubmit(event) {
-      alert('Search for stock: ' + this.state.value);
+      // alert('Search for stock: ' + this.state.value);
       event.preventDefault();
       this.props.submitTick(this.state.value)
     }
