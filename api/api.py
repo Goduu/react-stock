@@ -78,7 +78,7 @@ def login():
     if user:
         if(verify_and_update_password(data['password'],user )):
             token = jwt.encode({'user' : data['email'], 
-                'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=1)},
+                'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)},
                 app.config['SECRET_KEY'], algorithm="HS256")
             print("Logged as ", data['email'])
             return jsonify({'token' : token})
@@ -128,10 +128,16 @@ def get_quote_data():
 @token_required
 def get_user_data():
     email = request.args.get('email')
-    print("email", email)
     user = user_datastore.find_user(email=email)
     print("get_user_data", user.email,user.username)
     return jsonify({'ok': 'ok'})
+
+@app.route('/api/get_earnings_history/')
+@token_required
+def get_earnings_history():
+    tick = request.args.get('tick')
+    print("get_earns_history",tick)
+    return jsonify(rq.get_earnings_history_(tick))
 
 
 

@@ -31,10 +31,10 @@ class PriceChart extends React.Component{
       let priceChartReference = this.priceChartReference
       rq.getData(tick).then(function (res){
         if(res){
-          let data = {...priceChartReference.current.state.dataTest}
+          let data = {...priceChartReference.current.state.data}
           data.labels = res[0]
           data.datasets[0].data =  res[1]
-          priceChartReference.current.setState({dataTest: data})
+          priceChartReference.current.setState({data: data})
         }
        
       })
@@ -44,10 +44,11 @@ class PriceChart extends React.Component{
       
         return rq.getQuoteData(tick)
         .then(function (res){
-          if(res.financialCurrency & res.longName){
+          console.log('get quote data', res)
+          if(res.currency && res.longName){
             blockRef.current.setState(
             {headtitle: res.longName.concat(" - ").concat(tick),
-                 value: res.financialCurrency.concat(" ").concat(res.regularMarketPrice),
+                 value: res.currency.concat(" ").concat(res.regularMarketPrice),
                  })
           }
   
@@ -69,7 +70,7 @@ class PriceChart extends React.Component{
           headtitle={this.name.concat(" - ").concat(this.tick)}
           value={this.price}
           subtitle="Price"
-          chart={<LineChart data={this.dataTest_} ref={this.priceChartReference}/>}
+          chart={<LineChart data={this.data} ref={this.priceChartReference}/>}
           ref={this.blockRef}
           ></Block>
    

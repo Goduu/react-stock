@@ -59,6 +59,16 @@ def get_quote_data(tick):
     data = yf.get_quote_data(tick)
     return data
 
+def get_earnings_history_(tick):
+    ern_hist = yf.get_earnings_history(tick)
+    epsactual = [ eh['epsactual']
+             for eh in ern_hist ][::-1]
+    epsestimate = [ eh['epsestimate']
+            for eh in ern_hist ][::-1]
+    date = [ eh['startdatetime'][0:10]
+            for eh in ern_hist ][::-1]
+ 
+    return {'epsactual': epsactual,'epsestimate':epsestimate,'date': date}
 
 # get_analysts_info
 # get_balance_sheet

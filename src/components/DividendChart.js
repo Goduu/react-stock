@@ -11,6 +11,7 @@ class DividendChart extends React.Component{
     constructor(props) {
         super(props);
         this.tick = props.tick;
+        this.state = {tick: props.tick}
         this.name = "Amazon"
         this.dividend = null
         this.setNewTick = this.setNewTick.bind(this);
@@ -31,11 +32,12 @@ class DividendChart extends React.Component{
       let chartRef = this.chartRef
       rq.getDividends(tick).then(function (res){
         if(res){
-          let data = {...chartRef.current.state.dataTest}
+          console.log("dividend", res)
+          let data = {...chartRef.current.state.data}
           data.labels = res[0]
           data.datasets[0].data =  res[1]
           console.log("inserting data: ", data)
-          chartRef.current.setState({dataTest: data})
+          chartRef.current.setState({data: data})
         }
         
       })
@@ -68,7 +70,7 @@ class DividendChart extends React.Component{
           <Block 
           headtitle={this.name.concat(" - ").concat(this.tick)}
           value={this.dividend}
-          chart={<BarChart data={this.dataTest_} ref={this.chartRef}/>}
+          chart={<BarChart data={this.data} ref={this.chartRef}/>}
           ref={this.blockRef}
           ></Block>
    

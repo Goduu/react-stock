@@ -43,16 +43,15 @@ const options = {
 class BarChart extends React.Component { 
   constructor(props) {
     super(props);
-    this.state = {dataTest: data};
+    this.state = {data: data};
   }
   render() {
-    const dataTest = this.state.dataTest;
 
-    if(dataTest){
+    if(this.state.data){
       return (
           <div 
           className="line-chart">
-              <Bar data={dataTest}
+              <Bar data={this.state.data}
                 options={options}/>
           </div>
         );

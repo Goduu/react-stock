@@ -49,16 +49,15 @@ const options = {
 class LineChart extends React.Component { 
   constructor(props) {
     super(props);
-    this.state = {dataTest: data};
+    this.state = {data: data};
   }
   render() {
-    const dataTest = this.state.dataTest;
 
-    if(dataTest){
+    if(this.state.data){
       return (
           <div 
           className="line-chart">
-              <Line data={dataTest}
+              <Line data={this.state.data}
                 options={options}/>
           </div>
         );

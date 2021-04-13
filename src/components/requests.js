@@ -64,6 +64,16 @@ export function getQuoteData(tick){
   });
 }
 
+export function getEarningsHistory(tick){
+  return new Promise((resolve, reject) => {
+    axios.get(apiUrl+'get_earnings_history/?tick=' + tick)
+      .then(res => {
+        console.log('get_earns_history',res )
+        resolve(res.data)
+      })
+  });
+}
+
 export function getData(tick){
   return new Promise((resolve, reject) => {
     axios.get(apiUrl+'data/?tick='+ tick)

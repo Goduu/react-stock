@@ -3,6 +3,7 @@ import React from 'react'
 import * as rq from './requests'
 import TextField from './TextField';
 import PriceChart from './PriceChart';
+import EarningsPriceChart from './charts/EarningsPriceChart';
 import DividendChart from './DividendChart';
 
 class StocksDashboard extends React.Component{
@@ -25,9 +26,6 @@ class StocksDashboard extends React.Component{
         console.log("Tick handleSubmit", this.tick)
         // this.priceChartRef.current.getPriceData(tick);
         // this.dividendChartRef.current.getDividendData(tick);
-        rq.get_live_price(tick).then(res =>{
-         this.price = res
-        })
       }
 
     render() {
@@ -35,8 +33,12 @@ class StocksDashboard extends React.Component{
                 <div className="stock-dashboard">
                     Stock: <TextField submitTick={this.handleSubmitTick}/>
                     <div style={{display:'flex'}}>
-                        <PriceChart tick={this.tick} ref={this.priceChartRef}/>
-                        <DividendChart tick={this.tick} ref={this.dividendChartRef}/>
+                        <PriceChart tick={this.state.tick} ref={this.priceChartRef}/>
+                        <DividendChart tick={this.state.tick} ref={this.dividendChartRef}/>
+                    </div>
+                    <div>
+                        <EarningsPriceChart tick={this.state.tick} ref={this.dividendChartRef}/>
+
                     </div>
                 </div>
             );

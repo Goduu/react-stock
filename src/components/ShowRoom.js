@@ -14,7 +14,7 @@ import DividendChart from './DividendChart';
 import Login from './Login';
 
 
-let dataTest_ = {
+let data = {
   labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
   datasets: [
     {
@@ -35,6 +35,7 @@ class ShowRoom extends React.Component{
     this.getBarChartData = this.getBarChartData.bind(this);
     this.handleSubmitTick = this.handleSubmitTick.bind(this);
     this.setToken = this.setToken.bind(this);
+    this.getEarnsHistory = this.getEarnsHistory.bind(this);
     this.chartLineReference = React.createRef();
     this.charBartReference = React.createRef();
     this.priceChartRef = React.createRef();
@@ -63,12 +64,21 @@ class ShowRoom extends React.Component{
     tick = tick ? tick : 'FRT'
     let chartLineReference = this.chartLineReference
     rq.getData(tick).then(function (res){
-      let data = {...chartLineReference.current.state.dataTest}
+      let data = {...chartLineReference.current.state.data}
       data.labels = res[0]
       data.datasets[0].data =  res[1]
-      chartLineReference.current.setState({dataTest: data})
+      chartLineReference.current.setState({data: data})
      
     })
+    
+   }
+
+   getEarnsHistory(){
+    let tick = 'FRT'
+    // // rq.getEarningsHistory(tick).then(function (res){
+      
+     
+    // })
     
    }
   getBarChartData(tick){
@@ -76,11 +86,11 @@ class ShowRoom extends React.Component{
     let charBartReference = this.charBartReference
     rq.getDividends(tick).then(function (res){
       console.log("charBartReference", charBartReference)
-      let data = {...charBartReference.current.state.dataTest}
+      let data = {...charBartReference.current.state.data}
       data.labels = res[0]
       data.datasets[0].data =  res[1]
       console.log("inserting data: ", data)
-      charBartReference.current.setState({dataTest: data})
+      charBartReference.current.setState({data: data})
      
     })
     console.log("state fin", charBartReference)
@@ -113,6 +123,7 @@ class ShowRoom extends React.Component{
                 <h1>ShowRoom</h1>
                 <p>Buttons</p>
                 <Login setToken={this.setToken}/>
+                <Button color="green" content="Earns" onClick={this.getEarnsHistory}></Button>
                 <Button color="green" content="Login" onClick={rq.login}></Button>
                 <Button color="green" content="Button Green" onClick={this.testOnClick}></Button>
                 <Button color="magenta" content="Button Magenta" onClick={this.testOnClick}/>
@@ -147,7 +158,7 @@ class ShowRoom extends React.Component{
                 </div>
                 <p>Chart</p>
                 <BlocksContainer content={ <div> {this.price} 
-                <LineChart data={dataTest_} ref={this.chartLineReference} />
+                <LineChart data={data} ref={this.chartLineReference} />
                 </div>
                 }
                 ></BlocksContainer>
