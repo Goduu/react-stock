@@ -6,6 +6,9 @@ sys.path.insert(0,parentdir)
 
 import stocks_requests as rq 
 
+def test_generic():
+    assert 1==1
+    
 def test_get_quote_data():
     data = rq.get_quote_data('FRT')
     
