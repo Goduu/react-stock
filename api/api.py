@@ -68,23 +68,31 @@ def token_required(f):
 
     return decorated
 
-@app.route('/api/login', methods=['GET', 'POST'])
-def login():
-    print("data",request.get_json())
-    data = json.loads(request.get_json()['data'])
-    print("data",data)
-    # auth = request.authorization
-    user = user_datastore.find_user(email= data['email'])
-    if user:
-        if(verify_and_update_password(data['password'],user )):
-            token = jwt.encode({'user' : data['email'], 
-                'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)},
-                app.config['SECRET_KEY'], algorithm="HS256")
-            print("Logged as ", data['email'])
-            return jsonify({'token' : token})
+# @app.route('/api/login', methods=['GET', 'POST'])
+# def login():
+#     print("data",request.get_json())
+#     data = json.loads(request.get_json()['data'])
+#     print("data",data)
+#     # auth = request.authorization
+#     user = user_datastore.find_user(email= data['email'])
+#     if user:
+#         if(verify_and_update_password(data['password'],user )):
+#             token = jwt.encode({'user' : data['email'], 
+#                 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)},
+#                 app.config['SECRET_KEY'], algorithm="HS256")
+#             print("Logged as ", data['email'])
+#             return jsonify({'token' : token})
 
     
-    return make_response('Could not verify!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+#     return make_response('Could not verify!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+
+@app.route('/api/login', methods=['GET', 'POST'])
+def login():
+    # return make_response('Could not verify!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+    return jsonify({'token' : jwt.encode({'user' : 'test@me.com', 
+                    'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)},
+                    app.config['SECRET_KEY'], algorithm="HS256")})
+    
 
 
 @app.route('/api/price/')
@@ -118,7 +126,7 @@ def get_dividends():
     return rq.get_dividends(tick)
 
 @app.route('/api/quote_data/')
-@token_required
+# @token_required
 def get_quote_data():
     tick = request.args.get('tick')
     print("get_quote_data")

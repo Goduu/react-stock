@@ -54,10 +54,19 @@ def get_dividends(tick):
     return data.to_json()
 
 @except_handler
-def get_quote_data(tick):
-    print("in get_quote_data", tick)
-    data = yf.get_quote_data(tick)
+def get_quote_data(ticker):
+    print("in get_quote_data", ticker)
+    resp = yf.get_quote_data(ticker)
+    print("respo", resp)
+    data = {
+        'ticker': ticker,
+        'name': resp.get('shortName'),
+        'currency': resp.get('currency'),
+        'price': resp.get('regularMarketPrice'),
+        'marketStatus': resp.get('marketState'),
+    }
     return data
+
 
 def get_earnings_history_(tick):
     ern_hist = yf.get_earnings_history(tick)
