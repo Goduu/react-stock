@@ -55,9 +55,7 @@ def get_dividends(tick):
 
 @except_handler
 def get_quote_data(ticker):
-    print("in get_quote_data", ticker)
     resp = yf.get_quote_data(ticker)
-    print("respo", resp)
     data = {
         'ticker': ticker,
         'name': resp.get('shortName'),

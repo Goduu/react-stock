@@ -9,7 +9,7 @@ import datetime
 import json
 from functools import wraps
 import sys
-
+from db import add_user, validate_password,save_grid_elements,get_grid_elements
 #--------
 import os
 
@@ -19,25 +19,16 @@ from flask_security import Security, current_user, auth_required, \
 from flask_security.utils import hash_password, verify_and_update_password
 from database import db_session, init_db
 from models import User, Role
+import configparser
+from factory import create_app
 
-# Create app
-app = Flask(__name__)
-CORS(app, origins = "http://localhost:3000")
-app.config['DEBUG'] = True
-
-# Generate a nice key using secrets.token_urlsafe()
-app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", 'pf9Wkove4IKEAXvy-cQkeDPhv9Cb3Ag-wyJILbq_dFw')
-# Bcrypt is set as default SECURITY_PASSWORD_HASH, which requires a salt
-# Generate a good salt using: secrets.SystemRandom().getrandbits(128)
-app.config['SECURITY_PASSWORD_SALT'] = os.environ.get("SECURITY_PASSWORD_SALT", '146585145368132386173505678016728509634')
-# app.config['CORS_HEADERS'] = 'Content-Type'
-
+config = configparser.ConfigParser()
+config.read(os.path.abspath(os.path.join(".ini")))
 
 # Setup Flask-Security
-user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
-security = Security(app, user_datastore)
 
 
+app = create_app()
 # Create a user to test with
 @app.before_first_request
 def create_user():
@@ -88,10 +79,49 @@ def token_required(f):
 
 @app.route('/api/login', methods=['GET', 'POST'])
 def login():
+    # print("data",request.get_json())
+    data = json.loads(request.get_json()['data'])
+    print("EM PASS",data.get('user'), data.get('password'))
+    res = validate_password(data.get('user'), data.get('password'))
+    return res
+    
+    # if user:
+    #     if(verify_and_update_password(data['password'],user )):
+    #         token = jwt.encode({'user' : data['email'], 
+    #             'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)},
+    #             app.config['SECRET_KEY'], algorithm="HS256")
+    #         print("Logged as ", data['email'])
+    #         return jsonify({'token' : token})
     # return make_response('Could not verify!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
-    return jsonify({'token' : jwt.encode({'user' : 'test@me.com', 
-                    'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)},
-                    app.config['SECRET_KEY'], algorithm="HS256")})
+    # return jsonify({'token' : jwt.encode({'user' : 'test@me.com', 
+    #                 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=10)},
+    #                 app.config['SECRET_KEY'], algorithm="HS256")})
+
+
+@app.route('/api/post_grid_elements', methods=['GET', 'POST'])
+def post_grid_elements():
+    # print("data",request.get_json())
+    data = json.loads(request.get_json()['data'])
+    print("save_grid_elements",data)
+    save_grid_elements(data.get('id'), data.get('user'), data.get('grid'), data.get('layout'))
+    # res = validate_password(data.get('user'), data.get('password'))
+    return jsonify({"msg":"ok"})
+
+@app.route('/api/get_grid_elements', methods=['GET','POST'])
+def get_grid_elements_():
+    user = json.loads(request.get_json()['data'])['user']
+    print("--------------get grid el", user)
+    print("--------------get grid el",get_grid_elements(user) )
+   
+    return jsonify(get_grid_elements(user))
+
+
+@app.route('/api/add_user', methods=['GET','POST'])
+def add_user_():
+    data = json.loads(request.get_json()['data'])
+    print(data)
+    res = add_user("test", data.get('email'), data.get('password'))
+    return jsonify(res)                   
     
 
 
@@ -130,7 +160,7 @@ def get_dividends():
 def get_quote_data():
     tick = request.args.get('tick')
     print("get_quote_data")
-    return rq.get_quote_data(tick)
+    return jsonify(rq.get_quote_data(tick))
 
 @app.route('/api/get_user_data/')
 @token_required
@@ -150,7 +180,18 @@ def get_earnings_history():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port="5000", debug=True)
+    
+    user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
+    security = Security(app, user_datastore)
+    app.config['DEBUG'] = True
+    app.config['MFLIX_DB_URI'] = config['PROD']['MFLIX_DB_URI']
+    app.config['MFLIX_NS'] = config['PROD']['MFLIX_NS']
+    app.config['SECRET_KEY'] = config['PROD']['SECRET_KEY']
+    app.config['DEBUG'] = True
+    # app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", 'pf9Wkove4IKEAXvy-cQkeDPhv9Cb3Ag-wyJILbq_dFw')
+    app.config['SECURITY_PASSWORD_SALT'] = os.environ.get("SECURITY_PASSWORD_SALT", '146585145368132386173505678016728509634')
+    CORS(app, origins = "http://localhost:3000")
+    app.run(host="0.0.0.0", port=5000, debug=True)
     # socketio.run(app,port=5000, host='0.0.0.0')
 
 # if __name__ == "__main__":
