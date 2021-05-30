@@ -8,7 +8,6 @@ from datetime import datetime
 from functools import wraps
 import sys
 
-
 def except_handler(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -46,6 +45,46 @@ def get_data(tick):
         return data.to_json()
     except:
         return({'message' : 'Error in request!'})
+
+# @except_handler
+def get_price_data(tick,period):
+    end_date = datetime.today()
+    delta = timedelta(days=int(period))
+    start_date = (end_date-delta)
+    end_date = end_date
+    print("in get data", tick)
+    if(int(period)<0):
+        data = yf.get_data(tick)
+    else:
+        data = yf.get_data(tick, start_date = start_date, end_date = end_date)
+    
+    resp = []
+    for id,value in enumerate(data.open):
+        resp.append({
+            'timestamp': datetime.timestamp(data.index[id]),
+            'value': round(value,2)
+            })
+
+    return jsonify({'data':resp})
+
+def get_dividend_data(tick,period):
+    end_date = datetime.today()
+    delta = timedelta(days=int(period))
+    start_date = (end_date-delta)
+    end_date = end_date
+    if(int(period)<0):
+        data = yf.get_dividends(tick)
+    else:
+        data = yf.get_dividends(tick, start_date = start_date, end_date = end_date)
+    resp = []
+    for idx,value in enumerate(data.dividend):
+        resp.append(
+            {
+                'timestamp': datetime.timestamp(data.index[idx]),
+                'value': value
+            }
+        )
+    return jsonify({'data':resp})
 
 @except_handler
 def get_dividends(tick):

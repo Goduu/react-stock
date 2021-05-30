@@ -1,24 +1,15 @@
-import time
-from flask import Flask,jsonify, request, make_response
+from flask import Flask,jsonify, request
 # from app_config import app
-from flask_cors import CORS,cross_origin
-from flask_accept import accept,accept_fallback
+from flask_cors import CORS
 import stocks_requests as rq
-import jwt 
-import datetime
 import json
+import jwt
 from functools import wraps
-import sys
-from db import add_user, validate_password,save_grid_elements,get_grid_elements
+from db import add_user, validate_password,save_grid_elements,get_grid_elements,save_tickers,get_tickers, get_grids_identifiers
 #--------
 import os
 
-from flask import Flask, render_template_string
-from flask_security import Security, current_user, auth_required, \
-     SQLAlchemySessionUserDatastore
-from flask_security.utils import hash_password, verify_and_update_password
-from database import db_session, init_db
-from models import User, Role
+from flask import Flask
 import configparser
 from factory import create_app
 
@@ -30,21 +21,25 @@ config.read(os.path.abspath(os.path.join(".ini")))
 
 app = create_app()
 # Create a user to test with
-@app.before_first_request
-def create_user():
-    init_db()
-    print("Inicio")
-    if not user_datastore.find_user(email="test@me.com"):
-        print("Inicio")
-        user_datastore.create_user(email="test@me.com", password=hash_password("password"))
-    db_session.commit()
+# @app.before_first_request
+# def create_user():
+#     if not user_datastore.find_user(email="test@me.com"):
+#         user_datastore.create_user(email="test@me.com", password=hash_password("password"))
+#     db_session.commit()
+
+# @app.before_first_request
+# def initial_setup():
+#     #possible exchanges: https://docs.google.com/spreadsheets/d/1I3pBxjfXB056-g_JYf_6o3Rns3BV2kMGG1nCatb91ls/edit#gid=0
+#     save_tickers('SA')
+#     save_tickers('US')
+#     save_tickers('F')
+#     save_tickers('PA')
 
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         # token = request.args.get('token') #http://127.0.0.1:5000/route?token=alshfjfjdklsfj89549834ur
         token = request.headers.get('Authorization').split(" ")[1] if request.headers.get('Authorization') else None 
-        print(token)
         if not token:
             return jsonify({'message' : 'Token is missing!'}), 403
         try: 
@@ -52,7 +47,7 @@ def token_required(f):
         except jwt.exceptions.ExpiredSignatureError:
             return jsonify({'message' : 'Token is expired!'}), 401
         except:
-            print("ERROR",sys.exc_info()[0])
+            # print("ERROR",sys.exc_info()[0])
             return jsonify({'message' : 'Token is invalid!'}), 401
 
         return f(*args, **kwargs)
@@ -98,11 +93,12 @@ def login():
     #                 app.config['SECRET_KEY'], algorithm="HS256")})
 
 
+
+
 @app.route('/api/post_grid_elements', methods=['GET', 'POST'])
 def post_grid_elements():
     # print("data",request.get_json())
     data = json.loads(request.get_json()['data'])
-    print("save_grid_elements",data)
     save_grid_elements(data.get('id'), data.get('user'), data.get('grid'), data.get('layout'))
     # res = validate_password(data.get('user'), data.get('password'))
     return jsonify({"msg":"ok"})
@@ -110,8 +106,6 @@ def post_grid_elements():
 @app.route('/api/get_grid_elements', methods=['GET','POST'])
 def get_grid_elements_():
     user = json.loads(request.get_json()['data'])['user']
-    print("--------------get grid el", user)
-    print("--------------get grid el",get_grid_elements(user) )
    
     return jsonify(get_grid_elements(user))
 
@@ -125,11 +119,45 @@ def add_user_():
     
 
 
+@app.route('/api/getTickers/', methods=['GET'])
+# @token_required
+def get_tickers_():
+
+    page = int(request.args.get('page'))
+    search = request.args.get('search')
+    exchange = request.args.get('exchange')
+    print("get_live_price", page, search,exchange)
+    return jsonify(get_tickers(page,exchange,search))
+
+@app.route('/api/getUserIdentifiers/', methods=['GET'])
+# @token_required
+def get_grids_identifiers_():
+
+    user = request.args.get('user')
+    return get_grids_identifiers(user)
+
+@app.route('/api/priceData/', methods=['GET'])
+# @token_required
+def get_price_data():
+    tick = request.args.get('tick')
+    period = request.args.get('period')
+    print("get_live_price", tick,period, request.args)
+    return rq.get_price_data(tick,period)
+
+
+@app.route('/api/dividendData/', methods=['GET'])
+# @token_required
+def get_dividend_data():
+    tick = request.args.get('tick')
+    period = request.args.get('period')
+    print("dividendData", tick,period)
+    return rq.get_dividend_data(tick,period)
+
+
 @app.route('/api/price/')
 @token_required
 def get_live_price():
     headers = request.headers
-    print("headers",headers)
     tick = request.args.get('tick')
     print("get_live_price")
     return rq.get_live_price(tick)
@@ -181,8 +209,6 @@ def get_earnings_history():
 
 if __name__ == '__main__':
     
-    user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
-    security = Security(app, user_datastore)
     app.config['DEBUG'] = True
     app.config['MFLIX_DB_URI'] = config['PROD']['MFLIX_DB_URI']
     app.config['MFLIX_NS'] = config['PROD']['MFLIX_NS']
